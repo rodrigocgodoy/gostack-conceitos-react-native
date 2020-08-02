@@ -21,11 +21,19 @@ export default function App() {
   }, [])
 
   async function handleLikeRepository(id, indexRepository) {
-    await api.post(`repositories/${id}/like`);
+    const response = await api.post(`repositories/${id}/like`);
 
-    await api.get('repositories').then(response => {
-      setRepositories(response.data);
-    })
+    const likedRepository = response.data;
+
+    const repositoriesUpdated = repositories.map(repository => {
+      if (repository.id === id) {
+        return likedRepository;
+      } else {
+        return repository;
+      }
+    });
+
+    setRepositories(repositoriesUpdated);
   }
 
   return (
@@ -33,25 +41,24 @@ export default function App() {
       <StatusBar barStyle="light-content" backgroundColor="#7159c1" />
       <SafeAreaView style={styles.container}>
       {repositories?.map((repository, indexRepository) => (
-        <View style={styles.repositoryContainer} key={indexRepository}>
+        <View style={styles.repositoryContainer} key={Math.random()}>
           <Text style={styles.repository}>{repository?.title}</Text>
-
-            <View style={styles.techsContainer}>
-              {repository?.techs.map((tech, indexTech) => (
-                <>
-                  <Text style={styles.tech} key={indexTech}>
-                    {tech}
-                  </Text>
-                </>
-              ))}
-            </View>
+          <View style={styles.techsContainer}>
+            {repository?.techs.map((tech, indexTech) => (
+              <>
+                <Text style={styles.tech} key={Math.random()}>
+                  {tech}
+                </Text>
+              </>
+            ))}
+          </View>
 
           <View style={styles.likesContainer}>
             <Text
               style={styles.likeText}
               testID={`repository-likes-${repository.id}`}
             >
-              {repository?.likes} curtidas
+              {`${repository?.likes} curtida${repository?.likes > 1 ? 's' : ''}`}
             </Text>
           </View>
 
